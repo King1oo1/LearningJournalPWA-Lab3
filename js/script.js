@@ -77,6 +77,42 @@ function initThemeSwitcher() {
     }
 }
 
+// Create new journal entry
+function createJournalEntry(title, content) {
+    const now = new Date();
+    const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+    const dateString = now.toLocaleDateString('en-US', options);
+    
+    const newEntryHTML = `
+        <article class="journal-entry collapsible">
+            <div class="collapsible-header">
+                <h2>${title}</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="entry-meta">Posted on: ${dateString}</div>
+                <p>${content}</p>
+            </div>
+        </article>
+    `;
+    
+    // Get the journal entries container
+    const journalEntries = document.querySelector('.container');
+    const formSection = document.querySelector('.journal-form-section');
+    
+    // Insert the new entry after the form section
+    if (formSection && journalEntries) {
+        formSection.insertAdjacentHTML('afterend', newEntryHTML);
+    }
+    
+    // Re-initialize collapsible sections for the new entry
+    initCollapsibleSections();
+}
+
 // Form Validation for Journal Page
 function initFormValidation() {
     const journalForm = document.getElementById('journal-form');
@@ -95,8 +131,13 @@ function initFormValidation() {
                 return false;
             }
             
-            // If validation passes, show success message
-            alert('Journal entry submitted successfully!');
+            // Create and display the new journal entry
+            createJournalEntry(titleInput.value, entryInput.value);
+            
+            // Show success message
+            alert('Journal entry submitted successfully! Your new entry has been added to the journal.');
+            
+            // Reset the form
             journalForm.reset();
             return true;
         });
@@ -112,7 +153,11 @@ function initCollapsibleSections() {
         const content = section.querySelector('.collapsible-content');
         
         if (header && content) {
-            header.addEventListener('click', function() {
+            // Remove existing event listeners to avoid duplicates
+            header.replaceWith(header.cloneNode(true));
+            const newHeader = section.querySelector('.collapsible-header');
+            
+            newHeader.addEventListener('click', function() {
                 const isOpen = content.style.display === 'block';
                 content.style.display = isOpen ? 'none' : 'block';
                 this.classList.toggle('active');
