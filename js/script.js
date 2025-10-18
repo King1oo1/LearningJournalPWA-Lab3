@@ -77,7 +77,78 @@ function initThemeSwitcher() {
     }
 }
 
-// Create new journal entry
+// Save journal entries to localStorage
+function saveJournalEntries(entries) {
+    localStorage.setItem('journalEntries', JSON.stringify(entries));
+}
+
+// Load journal entries from localStorage
+function loadJournalEntries() {
+    const entries = localStorage.getItem('journalEntries');
+    return entries ? JSON.parse(entries) : [];
+}
+
+// Delete journal entry
+function deleteJournalEntry(timestamp) {
+    const entries = loadJournalEntries();
+    const updatedEntries = entries.filter(entry => entry.timestamp !== timestamp);
+    saveJournalEntries(updatedEntries);
+    displayJournalEntries();
+}
+
+// Display all journal entries
+function displayJournalEntries() {
+    const entries = loadJournalEntries();
+    const entriesContainer = document.getElementById('journal-entries-container');
+    
+    if (!entriesContainer) return;
+    
+    // Clear existing entries (except static ones)
+    const staticEntries = entriesContainer.querySelectorAll('.static-entry');
+    entriesContainer.innerHTML = '';
+    
+    // Add back static entries
+    staticEntries.forEach(entry => {
+        entriesContainer.appendChild(entry);
+    });
+    
+    // Add dynamic entries from localStorage
+    entries.forEach(entry => {
+        const entryElement = createJournalEntryElement(entry.title, entry.content, entry.date, false, entry.timestamp);
+        entriesContainer.appendChild(entryElement);
+    });
+    
+    // Re-initialize collapsible sections and delete buttons
+    initCollapsibleSections();
+    initDeleteButtons();
+}
+
+// Create journal entry element
+function createJournalEntryElement(title, content, date, isStatic = true, timestamp = null) {
+    const deleteButton = isStatic ? '' : `<button class="delete-btn" data-timestamp="${timestamp}">🗑️ Delete</button>`;
+    
+    const entryHTML = `
+        <article class="journal-entry collapsible ${isStatic ? 'static-entry' : ''}">
+            <div class="collapsible-header">
+                <h2>${title}</h2>
+                <div class="entry-actions">
+                    <span class="toggle-icon">▼</span>
+                    ${deleteButton}
+                </div>
+            </div>
+            <div class="collapsible-content">
+                <div class="entry-meta">Posted on: ${date}</div>
+                <div class="entry-content">${content}</div>
+            </div>
+        </article>
+    `;
+    
+    const template = document.createElement('template');
+    template.innerHTML = entryHTML.trim();
+    return template.content.firstChild;
+}
+
+// Create and save new journal entry
 function createJournalEntry(title, content) {
     const now = new Date();
     const options = { 
@@ -87,30 +158,45 @@ function createJournalEntry(title, content) {
     };
     const dateString = now.toLocaleDateString('en-US', options);
     
-    const newEntryHTML = `
-        <article class="journal-entry collapsible">
-            <div class="collapsible-header">
-                <h2>${title}</h2>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="collapsible-content">
-                <div class="entry-meta">Posted on: ${dateString}</div>
-                <p>${content}</p>
-            </div>
-        </article>
-    `;
+    // Create entry object
+    const newEntry = {
+        title: title,
+        content: content,
+        date: dateString,
+        timestamp: now.getTime()
+    };
     
-    // Get the journal entries container
-    const journalEntries = document.querySelector('.container');
-    const formSection = document.querySelector('.journal-form-section');
+    // Get existing entries
+    const entries = loadJournalEntries();
     
-    // Insert the new entry after the form section
-    if (formSection && journalEntries) {
-        formSection.insertAdjacentHTML('afterend', newEntryHTML);
-    }
+    // Add new entry
+    entries.unshift(newEntry); // Add to beginning so newest shows first
     
-    // Re-initialize collapsible sections for the new entry
-    initCollapsibleSections();
+    // Save to localStorage
+    saveJournalEntries(entries);
+    
+    // Refresh the display
+    displayJournalEntries();
+    
+    return newEntry;
+}
+
+// Initialize delete buttons
+function initDeleteButtons() {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent triggering the collapsible header click
+            
+            const timestamp = parseInt(this.getAttribute('data-timestamp'));
+            const entryTitle = this.closest('.journal-entry').querySelector('h2').textContent;
+            
+            if (confirm(`Are you sure you want to delete "${entryTitle}"?`)) {
+                deleteJournalEntry(timestamp);
+            }
+        });
+    });
 }
 
 // Form Validation for Journal Page
@@ -131,7 +217,7 @@ function initFormValidation() {
                 return false;
             }
             
-            // Create and display the new journal entry
+            // Create and save the new journal entry
             createJournalEntry(titleInput.value, entryInput.value);
             
             // Show success message
@@ -154,10 +240,15 @@ function initCollapsibleSections() {
         
         if (header && content) {
             // Remove existing event listeners to avoid duplicates
-            header.replaceWith(header.cloneNode(true));
-            const newHeader = section.querySelector('.collapsible-header');
+            const newHeader = header.cloneNode(true);
+            header.parentNode.replaceChild(newHeader, header);
             
-            newHeader.addEventListener('click', function() {
+            newHeader.addEventListener('click', function(e) {
+                // Don't collapse if delete button was clicked
+                if (e.target.classList.contains('delete-btn')) {
+                    return;
+                }
+                
                 const isOpen = content.style.display === 'block';
                 content.style.display = isOpen ? 'none' : 'block';
                 this.classList.toggle('active');
@@ -186,7 +277,13 @@ document.addEventListener('DOMContentLoaded', function() {
     displayLiveDate();
     initThemeSwitcher();
     initFormValidation();
-    initCollapsibleSections();
+    
+    // Load and display journal entries (this will also initialize collapsible sections and delete buttons)
+    if (window.location.pathname.includes('journal.html')) {
+        displayJournalEntries();
+    } else {
+        initCollapsibleSections();
+    }
     
     console.log('All JavaScript features initialized successfully!');
 });
