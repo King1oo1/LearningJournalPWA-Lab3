@@ -77,7 +77,27 @@ function initThemeSwitcher() {
     }
 }
 
-// Form Validation for Journal Page
+// Create New Journal Entry
+function createJournalEntry(title, content, date) {
+    const journalEntryHTML = `
+        <article class="journal-entry collapsible">
+            <div class="collapsible-header">
+                <h2>${title}</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="entry-meta">Posted on: ${date}</div>
+                <div class="entry-content">
+                    ${content.replace(/\n/g, '<br>')}
+                </div>
+            </div>
+        </article>
+    `;
+    
+    return journalEntryHTML;
+}
+
+// Form Validation and Journal Entry Creation
 function initFormValidation() {
     const journalForm = document.getElementById('journal-form');
     
@@ -87,7 +107,18 @@ function initFormValidation() {
             
             const titleInput = document.getElementById('journal-title');
             const entryInput = document.getElementById('journal-entry');
-            const wordCount = entryInput.value.trim().split(/\s+/).filter(word => word.length > 0).length;
+            const title = titleInput.value.trim();
+            const content = entryInput.value.trim();
+            
+            // Count words (split by spaces and filter out empty strings)
+            const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
+            
+            // Validation
+            if (!title) {
+                alert('Please enter a title for your journal entry.');
+                titleInput.focus();
+                return false;
+            }
             
             if (wordCount < 10) {
                 alert(`Please write at least 10 words. You currently have ${wordCount} words.`);
@@ -95,9 +126,32 @@ function initFormValidation() {
                 return false;
             }
             
-            // If validation passes, show success message
-            alert('Journal entry submitted successfully!');
+            // Get current date
+            const now = new Date();
+            const dateString = now.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Create new journal entry
+            const newEntryHTML = createJournalEntry(title, content, dateString);
+            
+            // Find where to insert the new entry (after the form, before existing entries)
+            const journalFormSection = document.querySelector('.journal-form-section');
+            if (journalFormSection) {
+                journalFormSection.insertAdjacentHTML('afterend', newEntryHTML);
+            }
+            
+            // Re-initialize collapsible sections for the new entry
+            initCollapsibleSections();
+            
+            // Show success message
+            alert('Journal entry added successfully!');
+            
+            // Reset form
             journalForm.reset();
+            
             return true;
         });
     }
@@ -108,6 +162,14 @@ function initCollapsibleSections() {
     const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
     
     collapsibleHeaders.forEach(header => {
+        // Remove any existing event listeners to prevent duplicates
+        header.replaceWith(header.cloneNode(true));
+    });
+    
+    // Re-select after cloning
+    const freshHeaders = document.querySelectorAll('.collapsible-header');
+    
+    freshHeaders.forEach(header => {
         // Find the content for this specific header
         const content = header.nextElementSibling;
         
