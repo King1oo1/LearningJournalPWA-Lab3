@@ -103,28 +103,38 @@ function initFormValidation() {
     }
 }
 
-// Collapsible Sections
+// Collapsible Sections - FIXED VERSION
 function initCollapsibleSections() {
-    const collapsibles = document.querySelectorAll('.collapsible');
+    const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
     
-    collapsibles.forEach(section => {
-        const header = section.querySelector('.collapsible-header');
-        const content = section.querySelector('.collapsible-content');
+    collapsibleHeaders.forEach(header => {
+        // Find the content for this specific header
+        const content = header.nextElementSibling;
         
-        if (header && content) {
+        if (content && content.classList.contains('collapsible-content')) {
+            // Add click event to header
             header.addEventListener('click', function() {
-                const isOpen = content.style.display === 'block';
-                content.style.display = isOpen ? 'none' : 'block';
-                this.classList.toggle('active');
-                
-                // Update toggle icon
-                const toggleIcon = this.querySelector('.toggle-icon');
-                if (toggleIcon) {
-                    toggleIcon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+                // Toggle the content visibility
+                if (content.style.display === 'block' || content.style.display === '') {
+                    content.style.display = 'none';
+                    this.classList.remove('active');
+                    // Update toggle icon
+                    const toggleIcon = this.querySelector('.toggle-icon');
+                    if (toggleIcon) {
+                        toggleIcon.style.transform = 'rotate(0deg)';
+                    }
+                } else {
+                    content.style.display = 'block';
+                    this.classList.add('active');
+                    // Update toggle icon
+                    const toggleIcon = this.querySelector('.toggle-icon');
+                    if (toggleIcon) {
+                        toggleIcon.style.transform = 'rotate(180deg)';
+                    }
                 }
             });
             
-            // Start with content collapsed
+            // Start with all sections collapsed
             content.style.display = 'none';
         }
     });
