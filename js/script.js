@@ -144,4 +144,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initCollapsibleSections();
     
     console.log('All JavaScript features initialized successfully!');
+    
+    // Demonstrate DOM selection methods
+    console.log('DOM Selection Methods Used:');
+    console.log('- getElementById: for single elements like live-date, theme-toggle');
+    console.log('- querySelectorAll: for multiple elements like collapsible sections');
 });
