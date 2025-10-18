@@ -77,96 +77,6 @@ function initThemeSwitcher() {
     }
 }
 
-// Save journal entries to localStorage
-function saveJournalEntries(entries) {
-    localStorage.setItem('journalEntries', JSON.stringify(entries));
-}
-
-// Load journal entries from localStorage
-function loadJournalEntries() {
-    const entries = localStorage.getItem('journalEntries');
-    return entries ? JSON.parse(entries) : [];
-}
-
-// Display all journal entries
-function displayJournalEntries() {
-    const entries = loadJournalEntries();
-    const entriesContainer = document.getElementById('journal-entries-container');
-    
-    if (!entriesContainer) return;
-    
-    // Clear existing entries (except static ones)
-    const staticEntries = entriesContainer.querySelectorAll('.static-entry');
-    entriesContainer.innerHTML = '';
-    
-    // Add back static entries
-    staticEntries.forEach(entry => {
-        entriesContainer.appendChild(entry);
-    });
-    
-    // Add dynamic entries from localStorage
-    entries.forEach(entry => {
-        const entryElement = createJournalEntryElement(entry.title, entry.content, entry.date, false);
-        entriesContainer.appendChild(entryElement);
-    });
-    
-    // Re-initialize collapsible sections
-    initCollapsibleSections();
-}
-
-// Create journal entry element
-function createJournalEntryElement(title, content, date, isStatic = true) {
-    const entryHTML = `
-        <article class="journal-entry collapsible ${isStatic ? 'static-entry' : ''}">
-            <div class="collapsible-header">
-                <h2>${title}</h2>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="collapsible-content">
-                <div class="entry-meta">Posted on: ${date}</div>
-                <div class="entry-content">${content}</div>
-            </div>
-        </article>
-    `;
-    
-    const template = document.createElement('template');
-    template.innerHTML = entryHTML.trim();
-    return template.content.firstChild;
-}
-
-// Create and save new journal entry
-function createJournalEntry(title, content) {
-    const now = new Date();
-    const options = { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    };
-    const dateString = now.toLocaleDateString('en-US', options);
-    
-    // Create entry object
-    const newEntry = {
-        title: title,
-        content: content,
-        date: dateString,
-        timestamp: now.getTime()
-    };
-    
-    // Get existing entries
-    const entries = loadJournalEntries();
-    
-    // Add new entry
-    entries.unshift(newEntry); // Add to beginning so newest shows first
-    
-    // Save to localStorage
-    saveJournalEntries(entries);
-    
-    // Refresh the display
-    displayJournalEntries();
-    
-    return newEntry;
-}
-
 // Form Validation for Journal Page
 function initFormValidation() {
     const journalForm = document.getElementById('journal-form');
@@ -185,13 +95,8 @@ function initFormValidation() {
                 return false;
             }
             
-            // Create and save the new journal entry
-            createJournalEntry(titleInput.value, entryInput.value);
-            
-            // Show success message
-            alert('Journal entry submitted successfully! Your new entry has been added to the journal.');
-            
-            // Reset the form
+            // If validation passes, show success message
+            alert('Journal entry submitted successfully!');
             journalForm.reset();
             return true;
         });
@@ -207,11 +112,7 @@ function initCollapsibleSections() {
         const content = section.querySelector('.collapsible-content');
         
         if (header && content) {
-            // Remove existing event listeners to avoid duplicates
-            const newHeader = header.cloneNode(true);
-            header.parentNode.replaceChild(newHeader, header);
-            
-            newHeader.addEventListener('click', function() {
+            header.addEventListener('click', function() {
                 const isOpen = content.style.display === 'block';
                 content.style.display = isOpen ? 'none' : 'block';
                 this.classList.toggle('active');
@@ -240,13 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
     displayLiveDate();
     initThemeSwitcher();
     initFormValidation();
-    
-    // Load and display journal entries (this will also initialize collapsible sections)
-    if (window.location.pathname.includes('journal.html')) {
-        displayJournalEntries();
-    } else {
-        initCollapsibleSections();
-    }
+    initCollapsibleSections();
     
     console.log('All JavaScript features initialized successfully!');
 });
