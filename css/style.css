@@ -619,3 +619,45 @@ body {
         border: 1px solid #ddd;
     }
 }
+
+/* ===== DELETE BUTTON STYLES ===== */
+.entry-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+.dark-theme .delete-btn {
+    background: #e74c3c;
+}
+
+.dark-theme .delete-btn:hover {
+    background: #c0392b;
+}
+
+/* Ensure the header content is properly aligned */
+.collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.collapsible-header h2 {
+    margin: 0;
+    flex: 1;
+}
