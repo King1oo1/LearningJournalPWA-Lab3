@@ -452,22 +452,23 @@ body {
     background: rgba(255,255,255,0.3);
 }
 
-/* ===== COLLAPSIBLE SECTION STYLES ===== */
+/* ===== COLLAPSIBLE SECTION STYLES - ENHANCED ===== */
 .collapsible-header {
     cursor: pointer;
-    padding: 1.5rem;
+    padding: 1rem;
     background: #f8f9fa;
-    border-radius: 8px 8px 0 0;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: background-color 0.3s;
-    border-bottom: 1px solid #e9ecef;
+    border: 1px solid #e9ecef;
 }
 
 .dark-theme .collapsible-header {
     background: #2d2d2d;
-    border-bottom-color: #404040;
+    border-color: #404040;
 }
 
 .collapsible-header:hover {
@@ -481,6 +482,7 @@ body {
 .collapsible-header.active {
     background: #e9ecef;
     border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
 }
 
 .dark-theme .collapsible-header.active {
@@ -488,19 +490,30 @@ body {
 }
 
 .collapsible-content {
-    padding: 1.5rem;
+    padding: 1rem;
     background: var(--card-bg);
     border-radius: 0 0 8px 8px;
-    overflow: hidden;
+    border: 1px solid #e9ecef;
+    border-top: none;
+    margin-bottom: 2rem;
+}
+
+.dark-theme .collapsible-content {
+    border-color: #404040;
 }
 
 .toggle-icon {
-    transition: transform 0.3s;
+    transition: transform 0.3s ease;
     font-size: 0.8rem;
 }
 
 .collapsible-header.active .toggle-icon {
     transform: rotate(180deg);
+}
+
+/* Make sure journal entries have proper spacing */
+.journal-entry {
+    margin-bottom: 2rem;
 }
 
 /* ===== LIVE DATE STYLES ===== */
