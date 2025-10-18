@@ -9,28 +9,32 @@
 <body>
     <!-- Navigation will be inserted here by JavaScript -->
     
+     
     <main class="container">
         <h1>Learning Journal</h1>
         
         <!-- New Journal Entry Form -->
         <section class="journal-form-section">
             <h2>Add New Journal Entry</h2>
+            <p class="form-description">Fill out the form below to add a new journal entry. Your entry will appear at the top of the journal.</p>
             <form id="journal-form">
                 <div class="form-group">
                     <label for="journal-title">Title:</label>
-                    <input type="text" id="journal-title" name="title" required>
+                    <input type="text" id="journal-title" name="title" placeholder="e.g., Week 4: Advanced JavaScript" required>
                 </div>
                 <div class="form-group">
-                    <label for="journal-entry">Entry:</label>
+                    <label for="journal-entry">Entry Content:</label>
                     <textarea id="journal-entry" name="entry" rows="6" 
                               placeholder="Write your journal entry here (minimum 10 words)..." 
                               required></textarea>
-                    <small>Minimum 10 words required</small>
+                    <small>Minimum 10 words required. Your entry will be displayed below.</small>
                 </div>
-                <button type="submit" class="btn-primary">Submit Entry</button>
+                <button type="submit" class="btn-primary">Add Journal Entry</button>
             </form>
         </section>
         
+        <!-- Journal Entries Container -->
+        <div id="journal-entries-container">
         <!-- Existing Journal Entries -->
         <article class="journal-entry collapsible">
             <div class="collapsible-header">
