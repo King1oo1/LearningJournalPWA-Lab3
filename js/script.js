@@ -103,14 +103,9 @@ function displayJournalEntries() {
     
     if (!entriesContainer) return;
     
-    // Clear existing entries (except static ones)
-    const staticEntries = entriesContainer.querySelectorAll('.static-entry');
-    entriesContainer.innerHTML = '';
-    
-    // Add back static entries
-    staticEntries.forEach(entry => {
-        entriesContainer.appendChild(entry);
-    });
+    // Remove only dynamic entries (keep static ones)
+    const dynamicEntries = entriesContainer.querySelectorAll('.journal-entry:not(.static-entry)');
+    dynamicEntries.forEach(entry => entry.remove());
     
     // Add dynamic entries from localStorage
     entries.forEach(entry => {
@@ -118,7 +113,7 @@ function displayJournalEntries() {
         entriesContainer.appendChild(entryElement);
     });
     
-    // Re-initialize collapsible sections and delete buttons
+    // Initialize collapsible sections for ALL entries (static + dynamic)
     initCollapsibleSections();
     initDeleteButtons();
 }
@@ -138,7 +133,7 @@ function createJournalEntryElement(title, content, date, isStatic = true, timest
             </div>
             <div class="collapsible-content">
                 <div class="entry-meta">Posted on: ${date}</div>
-                <div class="entry-content">${content}</div>
+                <div class="entry-content">${content.replace(/\n/g, '<br>')}</div>
             </div>
         </article>
     `;
@@ -170,7 +165,7 @@ function createJournalEntry(title, content) {
     const entries = loadJournalEntries();
     
     // Add new entry
-    entries.unshift(newEntry); // Add to beginning so newest shows first
+    entries.unshift(newEntry);
     
     // Save to localStorage
     saveJournalEntries(entries);
@@ -187,8 +182,7 @@ function initDeleteButtons() {
     
     deleteButtons.forEach(button => {
         button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent triggering the collapsible header click
-            
+            e.stopPropagation();
             const timestamp = parseInt(this.getAttribute('data-timestamp'));
             const entryTitle = this.closest('.journal-entry').querySelector('h2').textContent;
             
@@ -230,16 +224,17 @@ function initFormValidation() {
     }
 }
 
-// Collapsible Sections
+// Collapsible Sections - FIXED VERSION
 function initCollapsibleSections() {
     const collapsibles = document.querySelectorAll('.collapsible');
     
     collapsibles.forEach(section => {
+        // Remove any existing event listeners to avoid duplicates
         const header = section.querySelector('.collapsible-header');
         const content = section.querySelector('.collapsible-content');
         
         if (header && content) {
-            // Remove existing event listeners to avoid duplicates
+            // Clone the header to remove old event listeners
             const newHeader = header.cloneNode(true);
             header.parentNode.replaceChild(newHeader, header);
             
@@ -249,19 +244,21 @@ function initCollapsibleSections() {
                     return;
                 }
                 
-                const isOpen = content.style.display === 'block';
-                content.style.display = isOpen ? 'none' : 'block';
-                this.classList.toggle('active');
+                const isCurrentlyOpen = content.style.display === 'block';
+                content.style.display = isCurrentlyOpen ? 'none' : 'block';
+                this.classList.toggle('active', !isCurrentlyOpen);
                 
                 // Update toggle icon
                 const toggleIcon = this.querySelector('.toggle-icon');
                 if (toggleIcon) {
-                    toggleIcon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+                    toggleIcon.style.transform = isCurrentlyOpen ? 'rotate(0deg)' : 'rotate(180deg)';
                 }
             });
             
-            // Start with content collapsed
-            content.style.display = 'none';
+            // Start with content collapsed (only if not already set)
+            if (content.style.display === '') {
+                content.style.display = 'none';
+            }
         }
     });
 }
@@ -278,10 +275,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initThemeSwitcher();
     initFormValidation();
     
-    // Load and display journal entries (this will also initialize collapsible sections and delete buttons)
+    // Load and display journal entries (this will also initialize collapsible sections)
     if (window.location.pathname.includes('journal.html')) {
         displayJournalEntries();
     } else {
+        // Initialize collapsible sections for other pages if needed
         initCollapsibleSections();
     }
     
