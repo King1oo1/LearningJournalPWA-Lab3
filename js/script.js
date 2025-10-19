@@ -29,46 +29,20 @@ function loadNavigation() {
     document.body.insertAdjacentHTML('afterbegin', navHTML);
 }
 
-
-// Live Date AND Time Display
-function displayLiveDateTime() {
-    const dateTimeElement = document.getElementById('live-date-time');
-    if (dateTimeElement) {
-        function updateDateTime() {
-            const now = new Date();
-            
-            // Format date
-            const dateOptions = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
-            const dateString = now.toLocaleDateString('en-US', dateOptions);
-            
-            // Format time
-            const timeString = now.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true
-            });
-            
-            // Combine date and time
-            dateTimeElement.innerHTML = `
-                <div class="date-part">${dateString}</div>
-                <div class="time-part">${timeString}</div>
-            `;
-        }
-        
-        // Update immediately
-        updateDateTime();
-        
-        // Update every second to show live time
-        setInterval(updateDateTime, 1000);
+// Live Date Display (Date only - no time)
+function displayLiveDate() {
+    const dateElement = document.getElementById('live-date');
+    if (dateElement) {
+        const now = new Date();
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        dateElement.textContent = now.toLocaleDateString('en-US', options);
     }
 }
-
 
 // Theme Switcher
 function initThemeSwitcher() {
@@ -152,17 +126,13 @@ function initFormValidation() {
                 return false;
             }
             
-             // Get current date and time
+            // Get current date only (no time)
             const now = new Date();
             const dateString = now.toLocaleDateString('en-US', { 
                 year: 'numeric', 
                 month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
+                day: 'numeric' 
             });
-            
             
             // Create new journal entry
             const newEntryHTML = createJournalEntry(title, content, dateString);
@@ -187,7 +157,7 @@ function initFormValidation() {
     }
 }
 
-// Collapsible Sections - FIXED VERSION
+// Collapsible Sections
 function initCollapsibleSections() {
     const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
     
@@ -240,13 +210,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadNavigation();
     
     // Initialize all features
-    displayLiveDate();
+    displayLiveDate(); // Back to date only
     initThemeSwitcher();
     initFormValidation();
     initCollapsibleSections();
     
     console.log('All JavaScript features initialized successfully!');
-    
+      
     // Demonstrate DOM selection methods
     console.log('DOM Selection Methods Used:');
     console.log('- getElementById: for single elements like live-date, theme-toggle');
