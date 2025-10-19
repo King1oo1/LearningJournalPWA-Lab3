@@ -13,12 +13,23 @@
         <section class="hero">
             <h1>Welcome to My Learning Journal</h1>
             <p>This is my personal space where I document my journey through the Mobile Application Development course and showcase my projects.</p>
-            <div class="live-date">
-                <strong>Today's Date:</strong> <span id="live-date"></span>
+            
+            
+            
+         <!-- Updated to show both Date AND Time -->
+            <div class="live-date-time">
+                <div class="date-time-container">
+                    <strong>Current Date & Time:</strong>
+                    <div id="live-date-time">
+                        <!-- JavaScript will insert date and time here -->
+                    </div>
+                </div>
             </div>
+            
             <button id="theme-toggle" class="theme-btn">🌙 Dark Mode</button>
         </section>
 
+        
         <section class="recent-posts">
             <h2>Recent Journal Entries</h2>
             <div class="posts-grid">
