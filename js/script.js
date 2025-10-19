@@ -1,4 +1,4 @@
-// js/script.js - Main JavaScript file for DOM manipulation
+// js/script.js as Main JavaScript file for DOM manipulation
 
 // Reusable Navigation Function
 function loadNavigation() {
