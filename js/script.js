@@ -29,20 +29,46 @@ function loadNavigation() {
     document.body.insertAdjacentHTML('afterbegin', navHTML);
 }
 
-// Live Date Display
-function displayLiveDate() {
-    const dateElement = document.getElementById('live-date');
-    if (dateElement) {
-        const now = new Date();
-        const options = { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        };
-        dateElement.textContent = now.toLocaleDateString('en-US', options);
+
+// Live Date AND Time Display
+function displayLiveDateTime() {
+    const dateTimeElement = document.getElementById('live-date-time');
+    if (dateTimeElement) {
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format date
+            const dateOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const dateString = now.toLocaleDateString('en-US', dateOptions);
+            
+            // Format time
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            
+            // Combine date and time
+            dateTimeElement.innerHTML = `
+                <div class="date-part">${dateString}</div>
+                <div class="time-part">${timeString}</div>
+            `;
+        }
+        
+        // Update immediately
+        updateDateTime();
+        
+        // Update every second to show live time
+        setInterval(updateDateTime, 1000);
     }
 }
+
 
 // Theme Switcher
 function initThemeSwitcher() {
@@ -126,13 +152,17 @@ function initFormValidation() {
                 return false;
             }
             
-            // Get current date
+             // Get current date and time
             const now = new Date();
             const dateString = now.toLocaleDateString('en-US', { 
                 year: 'numeric', 
                 month: 'long', 
-                day: 'numeric' 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
             });
+            
             
             // Create new journal entry
             const newEntryHTML = createJournalEntry(title, content, dateString);
