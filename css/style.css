@@ -516,39 +516,13 @@ body {
     margin-bottom: 2rem;
 }
 
-/* ===== LIVE DATE & TIME STYLES ===== */
-.live-date-time {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background: rgba(255,255,255,0.15);
+/* ===== LIVE DATE STYLES ===== */
+.live-date {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.1);
     border-radius: 8px;
     display: inline-block;
-    backdrop-filter: blur(10px);
-}
-
-.date-time-container {
-    text-align: center;
-}
-
-.date-time-container strong {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-}
-
-#live-date-time {
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-.date-part {
-    margin-bottom: 0.25rem;
-}
-
-.time-part {
-    font-family: 'Courier New', monospace;
-    color: #e74c3c;
-    font-size: 1.3rem;
 }
 
 /* ===== COMING SOON SECTION ===== */
