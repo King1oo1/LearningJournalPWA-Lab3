@@ -1,22 +1,22 @@
-// js/script.js as Main JavaScript file for DOM manipulation
-
-// Reusable Navigation Function
+// ===== REUSABLE NAVIGATION COMPONENT =====
 function loadNavigation() {
+    // Get current page filename
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     
+    // Create navigation HTML with template string
     const navHTML = `
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">Chandandeep Singh</a>
             
+            <!-- Hamburger menu for mobile -->
             <input type="checkbox" id="nav-toggle" class="nav-toggle">
             <label for="nav-toggle" class="nav-toggle-label">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span> <!-- Hamburger bars -->
             </label>
             
             <ul class="nav-menu">
+                <!-- Dynamic active class based on current page -->
                 <li><a href="index.html" class="${currentPage === 'index.html' ? 'active' : ''}">Home</a></li>
                 <li><a href="journal.html" class="${currentPage === 'journal.html' ? 'active' : ''}">Journal</a></li>
                 <li><a href="about.html" class="${currentPage === 'about.html' ? 'active' : ''}">About</a></li>
@@ -29,66 +29,72 @@ function loadNavigation() {
     document.body.insertAdjacentHTML('afterbegin', navHTML);
 }
 
-// Live Date Display
+// ===== LIVE DATE DISPLAY =====
 function displayLiveDate() {
-    const dateElement = document.getElementById('live-date');
+    const dateElement = document.getElementById('live-date'); // DOM selection by ID
     if (dateElement) {
-        const now = new Date();
+        const now = new Date(); // Create Date object
         const options = { 
             weekday: 'long', 
             year: 'numeric', 
             month: 'long', 
             day: 'numeric' 
         };
+        // Format date and display it
         dateElement.textContent = now.toLocaleDateString('en-US', options);
     }
 }
 
-// Theme Switcher
+// ===== THEME SWITCHER =====
 function initThemeSwitcher() {
-    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggle = document.getElementById('theme-toggle'); // Get theme button
+    
+    // Check user's preferred color scheme
     const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
     
-    // Check for saved theme or prefer OS theme
+    // Get saved theme or use OS preference
     const currentTheme = localStorage.getItem('theme') || 
                         (prefersDarkScheme.matches ? 'dark' : 'light');
     
-    // Apply the theme
+    // Apply saved theme on page load
     if (currentTheme === 'dark') {
         document.body.classList.add('dark-theme');
         if (themeToggle) themeToggle.textContent = '☀️ Light Mode';
     }
     
-    // Toggle theme when button is clicked
+    // Add click event listener to theme toggle button
     if (themeToggle) {
         themeToggle.addEventListener('click', function() {
+            // Toggle dark-theme class on body
             document.body.classList.toggle('dark-theme');
             
             let theme = 'light';
             if (document.body.classList.contains('dark-theme')) {
                 theme = 'dark';
-                this.textContent = '☀️ Light Mode';
+                this.textContent = '☀️ Light Mode'; // Update button text
             } else {
-                this.textContent = '🌙 Dark Mode';
+                this.textContent = '🌙 Dark Mode'; // Update button text
             }
             
+            // Save theme preference to localStorage
             localStorage.setItem('theme', theme);
         });
     }
 }
 
-// Create New Journal Entry
+// ===== JOURNAL ENTRY CREATION =====
 function createJournalEntry(title, content, date) {
+    // Create HTML for new journal entry using template string
     const journalEntryHTML = `
         <article class="journal-entry collapsible">
             <div class="collapsible-header">
-                <h2>${title}</h2>
+                <h2>${title}</h2> <!-- Dynamic title -->
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="collapsible-content">
-                <div class="entry-meta">Posted on: ${date}</div>
+                <div class="entry-meta">Posted on: ${date}</div> <!-- Dynamic date -->
                 <div class="entry-content">
-                    ${content.replace(/\n/g, '<br>')}
+                    ${content.replace(/\n/g, '<br>')} <!-- Convert newlines to <br> tags -->
                 </div>
             </div>
         </article>
@@ -97,36 +103,38 @@ function createJournalEntry(title, content, date) {
     return journalEntryHTML;
 }
 
-// Form Validation and Journal Entry Creation
+// ===== FORM VALIDATION =====
 function initFormValidation() {
-    const journalForm = document.getElementById('journal-form');
+    const journalForm = document.getElementById('journal-form'); // Get form by ID
     
     if (journalForm) {
+        // Add submit event listener to form
         journalForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Prevent default form submission
             
+            // Get form inputs
             const titleInput = document.getElementById('journal-title');
             const entryInput = document.getElementById('journal-entry');
             const title = titleInput.value.trim();
             const content = entryInput.value.trim();
             
-            // Count words (split by spaces and filter out empty strings)
+            // Count words using regex to split and filter empty strings
             const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
             
-            // Validation
+            // Validation checks
             if (!title) {
                 alert('Please enter a title for your journal entry.');
-                titleInput.focus();
+                titleInput.focus(); // Focus on title input
                 return false;
             }
             
             if (wordCount < 10) {
                 alert(`Please write at least 10 words. You currently have ${wordCount} words.`);
-                entryInput.focus();
+                entryInput.focus(); // Focus on entry input
                 return false;
             }
             
-            // Get current date
+            // Create new journal entry
             const now = new Date();
             const dateString = now.toLocaleDateString('en-US', { 
                 year: 'numeric', 
@@ -134,22 +142,21 @@ function initFormValidation() {
                 day: 'numeric' 
             });
             
-            // Create new journal entry
             const newEntryHTML = createJournalEntry(title, content, dateString);
             
-            // Find where to insert the new entry (after the form, before existing entries)
+            // Insert new entry after the form
             const journalFormSection = document.querySelector('.journal-form-section');
             if (journalFormSection) {
                 journalFormSection.insertAdjacentHTML('afterend', newEntryHTML);
             }
             
-            // Re-initialize collapsible sections for the new entry
+            // Re-initialize collapsible sections to include new entry
             initCollapsibleSections();
             
             // Show success message
             alert('Journal entry added successfully!');
             
-            // Reset form
+            // Reset form fields
             journalForm.reset();
             
             return true;
@@ -157,30 +164,31 @@ function initFormValidation() {
     }
 }
 
-// Collapsible Sections - FIXED VERSION
+// ===== COLLAPSIBLE SECTIONS =====
 function initCollapsibleSections() {
+    // Get all collapsible headers using querySelectorAll
     const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
     
+    // Remove existing event listeners by cloning nodes
     collapsibleHeaders.forEach(header => {
-        // Remove any existing event listeners to prevent duplicates
         header.replaceWith(header.cloneNode(true));
     });
     
-    // Re-select after cloning
+    // Re-select headers after cloning
     const freshHeaders = document.querySelectorAll('.collapsible-header');
     
     freshHeaders.forEach(header => {
-        // Find the content for this specific header
+        // Find the corresponding content section
         const content = header.nextElementSibling;
         
         if (content && content.classList.contains('collapsible-content')) {
-            // Add click event to header
+            // Add click event to each header
             header.addEventListener('click', function() {
-                // Toggle the content visibility
+                // Toggle content visibility
                 if (content.style.display === 'block' || content.style.display === '') {
                     content.style.display = 'none';
                     this.classList.remove('active');
-                    // Update toggle icon
+                    // Reset toggle icon
                     const toggleIcon = this.querySelector('.toggle-icon');
                     if (toggleIcon) {
                         toggleIcon.style.transform = 'rotate(0deg)';
@@ -188,7 +196,7 @@ function initCollapsibleSections() {
                 } else {
                     content.style.display = 'block';
                     this.classList.add('active');
-                    // Update toggle icon
+                    // Rotate toggle icon
                     const toggleIcon = this.querySelector('.toggle-icon');
                     if (toggleIcon) {
                         toggleIcon.style.transform = 'rotate(180deg)';
@@ -202,22 +210,20 @@ function initCollapsibleSections() {
     });
 }
 
-// Initialize everything when DOM is loaded
+// ===== INITIALIZE ALL FEATURES =====
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded - initializing JavaScript features');
     
-    // Load reusable navigation
-    loadNavigation();
-    
-    // Initialize all features
-    displayLiveDate();
-    initThemeSwitcher();
-    initFormValidation();
-    initCollapsibleSections();
+    // Load all features in order
+    loadNavigation();      // 1. Reusable navigation
+    displayLiveDate();     // 2. Live date display
+    initThemeSwitcher();   // 3. Theme switcher
+    initFormValidation();  // 4. Form validation
+    initCollapsibleSections(); // 5. Collapsible sections
     
     console.log('All JavaScript features initialized successfully!');
     
-    // Demonstrate DOM selection methods
+    // Debug information
     console.log('DOM Selection Methods Used:');
     console.log('- getElementById: for single elements like live-date, theme-toggle');
     console.log('- querySelectorAll: for multiple elements like collapsible sections');
